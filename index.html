@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8Ring | Solar System Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        
+        :root {
+            --bg-image: url('https://market-resized.envatousercontent.com/previews/files/384420771/02_Preview.jpg?w=590&h=590&cf_fit=crop&crop=top&format=auto&q=85&s=798d9cc2ce1f4107ce4637cf757352d264cdecb956a8f72b56d45b82133e8830');
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            transition: all 0.4s ease;
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Theme specific backgrounds */
+        .dark body {
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), var(--bg-image);
+            color: #f8fafc;
+        }
+        .light body {
+            background-color: #f1f5f9;
+            background-image: none;
+            color: #0f172a;
+        }
+
+        /* Glassmorphism Cards */
+        .planet-card {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .light .planet-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .planet-card {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .planet-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .planet-img {
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="sticky top-0 z-50 p-6 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-3xl font-extrabold tracking-tighter italic">
+                <span class="text-blue-500">8</span>RING
+            </div>
+            
+            <button id="themeToggle" class="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20">
+                <span id="themeIcon">🌙</span>
+                <span class="text-xs font-bold uppercase tracking-widest">Toggle Mode</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-16">
+        <section class="text-center mb-24">
+            <h1 class="text-6xl md:text-8xl font-black mb-6 tracking-tight">
+                THE SOLAR <span class="text-blue-500">SYSTEM</span>
+            </h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto opacity-70 leading-relaxed mb-10">
+                8Ring presents an interactive journey through our cosmic neighborhood. From the scorching plains of Mercury 
+                to the icy winds of Neptune, explore the giants and wonders that orbit our star.
+            </p>
+            <a href="index.html" class="inline-flex items-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-all shadow-xl shadow-blue-600/30 group">
+                ENTER SIMULATION
+                <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+        </section>
+
+        <div id="planetGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            </div>
+    </main>
+
+    <footer class="text-center py-20 opacity-40 text-xs font-medium tracking-[0.2em] uppercase">
+        &copy; 2026 8Ring Aerospace • Data via NASA Open API
+    </footer>
+
+    <script>
+        const planets = [
+            { name: "Mercury", type: "Terrestrial", dist: "57.9M km", img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg", info: "The smallest planet and closest to the Sun, with a surface scarred by craters." },
+            { name: "Venus", type: "Terrestrial", dist: "108.2M km", img: "https://upload.wikimedia.org/wikipedia/commons/0/08/Venus_from_Mariner_10.jpg", info: "Often called Earth's twin, but with a runaway greenhouse effect making it the hottest." },
+            { name: "Earth", type: "Terrestrial", dist: "149.6M km", img: "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg", info: "Our home base—the only known world in the universe to harbor life." },
+            { name: "Mars", type: "Terrestrial", dist: "227.9M km", img: "https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg", info: "A dusty, cold, desert world with a very thin atmosphere and iron-rich soil." },
+            { name: "Jupiter", type: "Gas Giant", dist: "778.6M km", img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg", info: "The massive king of planets, famous for its Great Red Spot storm." },
+            { name: "Saturn", type: "Gas Giant", dist: "1.4B km", img: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg", info: "The jewel of the solar system, known for its extensive and complex ring system." },
+            { name: "Uranus", type: "Ice Giant", dist: "2.9B km", img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg", info: "An ice giant that rotates at a nearly 90-degree angle from the plane of its orbit." },
+            { name: "Neptune", type: "Ice Giant", dist: "4.5B km", img: "https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg", info: "The most distant major planet, cold, dark, and whipped by supersonic winds." }
+        ];
+
+        const grid = document.getElementById('planetGrid');
+        
+        planets.forEach(p => {
+            grid.innerHTML += `
+                <div class="planet-card group overflow-hidden p-8 rounded-[2.5rem]">
+                    <div class="relative w-40 h-40 mx-auto mb-8">
+                        <img src="${p.img}" alt="${p.name}" class="planet-img w-full h-full object-cover rounded-full transform group-hover:rotate-12 transition-transform duration-700">
+                    </div>
+                    <h3 class="text-3xl font-extrabold mb-1 tracking-tight">${p.name}</h3>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-[10px] font-bold uppercase tracking-widest px-2 py-1 bg-blue-500/20 text-blue-400 rounded-md">${p.type}</span>
+                    </div>
+                    <div class="text-xs font-semibold opacity-50 mb-4 tracking-wider uppercase">Distance: ${p.dist}</div>
+                    <p class="text-sm leading-relaxed opacity-80 font-medium">${p.info}</p>
+                </div>
+            `;
+        });
+
+        // Toggle logic
+        const html = document.documentElement;
+        const toggleBtn = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        toggleBtn.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                themeIcon.innerText = '🌞';
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                themeIcon.innerText = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>
